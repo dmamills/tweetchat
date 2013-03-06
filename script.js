@@ -82,11 +82,21 @@ $(document).ready(function(){
 
  
  userRef.on('child_added',function(snapshot) {
- 	var userData = snapshot.val();
+ 	var tempUserData = snapshot.val();
+ 		
+ 	$('ul').append('<li>'+tempUserData.name+'</li>');
  	console.log('a user just logged in');
  });
 
  userRef.on('child_removed',function(snapshot){
+ 	var tempUserData = snapshot.val();
+
+ 		$('li').each(function(){
+ 		if($(this).text() == tempUserData.name) {
+ 			$(this).remove();
+ 			console.log('found it!');
+ 		}
+ 	});
  	console.log('a user just logged out');
  });
 
