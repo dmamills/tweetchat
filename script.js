@@ -17,7 +17,7 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 		currentUserRef.once('value',function(snapshot){
 			loggedInUser = snapshot.val();
 
-			$('h3').html("logged in as: "+loggedInUser.name).show();
+			$('h3').html("Hello, "+loggedInUser.name).show();
 			$('#prelogin').hide();
 			$('#chatwrapper').show();
 
@@ -91,6 +91,6 @@ messagesRef.limit(10).on('child_added',function(snapshot) {
 var newPost = function(name,picture,message) {
 
  	var rString = "<div class='message'> <div class='messagetop'> <div class='messageimage'> <img src='" + picture + "'> </div>"
- 	+ "<div class='messagename'> " + name + "</div> </div> <div class='messagetext'> " + message + " </div> </div>";
+ 	+ "<div class='messagename'> <a href='http://twitter.com/" + name + "'>"+ name+ " </a></div> </div> <div class='messagetext'> " + message + " </div> </div>";
  	return rString; 
 }
