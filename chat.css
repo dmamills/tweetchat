@@ -27,10 +27,6 @@ body {
 	border-radius:5px;
 }
 
-#prelogin img {
-	border:1px solid white;
-}
-
 #chatmessage {
 	width:95%;
 	margin:5px;
@@ -78,4 +74,9 @@ footer a:hover{
 
 footer a:visited{
 	color:#A0A0A0;
+}
+
+ui-tooltip {
+	font-size:10px;
+
 }

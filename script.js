@@ -6,6 +6,11 @@ var firebaseRef = new Firebase(fbUrl);
 var messagesRef = new Firebase(fbUrl + 'messages');
 var userRef = new Firebase(fbUrl + 'users');
 
+$(function() {
+	$(document).tooltip();
+});
+
+
 var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 	if(error) {
 		console.log(error);
@@ -91,7 +96,7 @@ messagesRef.limit(10).on('child_added',function(snapshot) {
 
 var newPost = function(name,picture,message) {
 
- 	var rString = "<div class='message'> <div class='messagetop'> <div class='messageimage'> <img src='" + picture + "'> </div>"
- 	+ "<div class='messagename'> <a href='http://twitter.com/" + name + "'>"+ name+ " </a></div> </div> <div class='messagetext'> " + message + " </div> </div>";
+ 	var rString = "<div class='message'> <div class='messagetop'> <div class='messageimage'> <a href='http://twitter.com/" + name + "' > <img src='" + picture + "'title='Hello world!'> </div>"
+ 	+ "<div class='messagename'> " + name+ "</a> </div> </div> <div class='messagetext'> " + message + " </div> </div>";
  	return rString; 
 }
