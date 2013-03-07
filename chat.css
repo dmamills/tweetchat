@@ -70,11 +70,12 @@ footer {
 
 footer a{
 	text-decoration: none;
+	color:#A0A0A0;
 }
 footer a:hover{
-	color:#AAAAAA;
+	color:#CFCFCF;
 }
 
 footer a:visited{
-	color:#BBBBBB;
+	color:#A0A0A0;
 }

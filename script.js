@@ -54,36 +54,37 @@ $(document).ready(function(){
 		loggedInUser = undefined;
 
 		$('h3').text('').hide();
-
 		$('#chatwrapper').hide();
 		$('#prelogin').show();
 	});
-});
 
+	$(window).unload(function(){
+		authClient.logout();
+		var currentUserRef = new Firebase(fbUrl + 'users/'+loggedInUser.name);
+		currentUserRef.remove();
+	});
+
+});
  
  userRef.on('child_added',function(snapshot) {
  	var tempUserData = snapshot.val();
- 		
  	$('ul').append('<li>'+tempUserData.name+'</li>');
- 	//console.log('a user just logged in');
  });
 
  userRef.on('child_removed',function(snapshot){
  	var tempUserData = snapshot.val();
-
  		$('li').each(function(){
  		if($(this).text() == tempUserData.name) {
  			$(this).remove();
  		}
  	});
- 	//console.log('a user just logged out');
  });
 
 
 messagesRef.limit(10).on('child_added',function(snapshot) {
 	var messageData = snapshot.val();
 
-	$('#chat').append(newPost(messageData.name,messageData.picture,messageData.message))
+	$('#chat').append(newPost(messageData.name,messageData.picture,messageData.message));
 	$('#chat').scrollTop($('#chat')[0].scrollHeight);
 });
 
