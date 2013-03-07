@@ -1,0 +1,50 @@
+body {
+	background-image: url('simple_dashed.png');
+	color:white;
+}
+
+#chatwrapper {
+	background-color:white;
+	margin: 0 auto;
+	border: 1px solid black;
+	width: 600px;
+	border-radius: 15px;
+	padding:15px;
+	color:black;
+}
+
+#chat {
+	margin: 0 auto;
+	border: 1px solid blue;
+	height: 500px;
+	overflow-y: scroll;
+	width:500px;
+}
+
+#chatmessage {
+	width:95%;
+	margin:5px;
+}
+
+.message {
+	border: 1px solid red;
+	margin: 1px 5px 1px 5px;
+	padding:5px;
+	border-radius: 5px;
+}
+
+.messagetop {
+	border:1px solid red;
+}
+
+.messagetext {
+	word-wrap:break-word;
+}
+
+input {
+	margin: 15px 5px 0 5px;
+}
+
+footer {
+	margin-top: 25px;
+}
