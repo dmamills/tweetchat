@@ -7,7 +7,18 @@ var messagesRef = new Firebase(fbUrl + 'messages');
 var userRef = new Firebase(fbUrl + 'users');
 
 $(function() {
-	$(document).tooltip();
+	$(document).tooltip({
+		items: "[title]",
+		content: function(){
+			var element = $(this);
+			if(element.is("[title]")) {
+				var userName = element[0].attributes.title.nodeValue;
+				var profileRef = new Firebase(fbUrl+'users/'+userName);
+				
+				return "<div class='miniprofile'> <b> hello, "+userName +" </b> <img src='twitterlight.png'> </div>";
+			}
+		}
+	});
 });
 
 
@@ -16,7 +27,19 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 		console.log(error);
 	} else if(user) {
 
-		userRef.child(user.username).set({name: user.username, profileimage: user.profile_image_url});
+
+		var templasttweet = (user.status) ? user.status.text : '';
+
+		userRef.child(user.username).set({ name: user.username, 
+										   profileimage: user.profile_image_url, 
+										   url: user.url,
+										   location: user.location, 
+										   description: user.description, 
+										   followers: user.followers_count, 
+										   following: user.friends_count, 
+										   lasttweet: templasttweet, 
+										   tweetcount: user.statuses_count 
+										});		
 
 		var currentUserRef = new Firebase(fbUrl+'users/'+user.username);
 		currentUserRef.once('value',function(snapshot){
@@ -27,7 +50,7 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 			$('#chatwrapper').show();
 
 		})
-		userRef.child(user.username).set({name: user.username, profileimage: user.profile_image_url});		
+		
 	}
 });
 
@@ -41,16 +64,17 @@ $(document).ready(function(){
 		authClient.login('twitter');
 	});
 
-	$('#chatbutton').on('click',function() {
+	$('#chatmessage').keypress(function(event){
+		if(event.keyCode === 13) {
 
-		var messageText = $('#chatmessage').val();
-
-		if(messageText == '')
-			return;
-		
-		messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
-		$('#chatmessage').val('')
+			var messageText = $('#chatmessage').val();
+			if(messageText == '')
+				return;
+			messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
+			$('#chatmessage').val('')
+		}
 	});
+
 
 	$('#logoutbutton').on('click',function(){
 		authClient.logout();
@@ -96,7 +120,7 @@ messagesRef.limit(10).on('child_added',function(snapshot) {
 
 var newPost = function(name,picture,message) {
 
- 	var rString = "<div class='message'> <div class='messagetop'> <div class='messageimage'> <a href='http://twitter.com/" + name + "' > <img src='" + picture + "'title='Hello world!'> </div>"
+ 	var rString = "<div class='message'> <div class='messagetop'> <div class='messageimage'> <a href='http://twitter.com/" + name + "' > <img src='" + picture + "'title='"+name+"'> </div>"
  	+ "<div class='messagename'> " + name+ "</a> </div> </div> <div class='messagetext'> " + message + " </div> </div>";
  	return rString; 
 }
