@@ -15,16 +15,8 @@ $(function() {
 			if(element.is("[title]")) {
 				var userName = element[0].attributes.title.nodeValue;
 				var profileRef = new Firebase(fbUrl+'users/'+userName);
-				profileRef.child('profileviews').set(1);
-				  
-				profileRef.on('value',function(snapshot){
-					
-					var tempValues = snapshot.val();	
-					$.delay(5000).profileRef.child('profileviews').set(0);
-					return getProfile(tempValues);	
-				});
-
-				//return "<div class='miniprofile'> <b> hello, "+userName +" </b> <img src='twitterlight.png'> </div>";
+				
+				return "<div class='miniprofile' style='color:white;background-color:black;'> <b> hello, "+userName +" </b> <img src='twitterlight.png'> </div>";
 			}
 		}
 	});
@@ -47,8 +39,7 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 										   followers: user.followers_count, 
 										   following: user.friends_count, 
 										   lasttweet: lastTweet, 
-										   tweetcount: user.statuses_count,
-										   profileviews: 0
+										   tweetcount: user.statuses_count
 										});		
 
 		var currentUserRef = new Firebase(fbUrl+'users/'+user.username);
@@ -73,11 +64,20 @@ $(document).ready(function(){
 	//enter key message submit
 	$('#chatmessage').keypress(function(event){
 		if(event.keyCode === 13) {
-			var messageText = $('#chatmessage').val();
-			if(messageText == '')
-				return;
-			messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
-			$('#chatmessage').val('')
+			//var messageText = $('#chatmessage').val();
+			//if(messageText == '')
+			//	return;
+			
+			if($('#chatmessage').val() != '') {
+				$('#chatmessage').profanityFilter({
+					externalSwears:'swearWords.json',
+					replaceWith:'*'
+				});
+				var messageText = $('#chatmessage').val();
+				messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
+				$('#chatmessage').val('')
+			}
+			
 		}
 	});
 
@@ -136,7 +136,7 @@ var getProfile = function(profileValues){
 							"<br/>"+profileValues.tweetcount + " tweets" +
 							"<br/>"+profileValues.lasttweet +
 							"<br/></div>";
-}
+};
 
 
 //create new message function
