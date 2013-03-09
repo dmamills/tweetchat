@@ -15,18 +15,15 @@ $(function() {
 			if(element.is("[title]")) {
 				var userName = element[0].attributes.title.nodeValue;
 				var profileRef = new Firebase(fbUrl+'users/'+userName);
-				  profileRef.once('value',function(snapshot){
-					var tempValues = snapshot.val();
-					return "<div class='miniprofile'> " +
-							"<a href='http://twitter.com/"+tempValues.name+ "'>@"+tempValues.name +"</a>" +
-							"<br/>"+tempValues.description +
-							"<br/>"+tempValues.location +
-							"<br/>"+tempValues.followers + " followers" +
-							"<br/>"+tempValues.following + " following" +
-							"<br/>"+tempValues.tweetcount + " tweets" +
-							"<br/>"+tempValues.lasttweet +
-							"<br/></div>";
+				profileRef.child('profileviews').set(1);
+				  
+				profileRef.on('value',function(snapshot){
+					
+					var tempValues = snapshot.val();	
+					$.delay(5000).profileRef.child('profileviews').set(0);
+					return getProfile(tempValues);	
 				});
+
 				//return "<div class='miniprofile'> <b> hello, "+userName +" </b> <img src='twitterlight.png'> </div>";
 			}
 		}
@@ -50,7 +47,8 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 										   followers: user.followers_count, 
 										   following: user.friends_count, 
 										   lasttweet: lastTweet, 
-										   tweetcount: user.statuses_count 
+										   tweetcount: user.statuses_count,
+										   profileviews: 0
 										});		
 
 		var currentUserRef = new Firebase(fbUrl+'users/'+user.username);
@@ -127,6 +125,18 @@ messagesRef.limit(10).on('child_added',function(snapshot) {
 	$('#chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
 	$('#chat').scrollTop($('#chat')[0].scrollHeight);
 });
+
+var getProfile = function(profileValues){
+   return "<div class='miniprofile'> " +
+							"<a href='http://twitter.com/"+profileValues.name+ "'>@"+profileValues.name +"</a>" +
+							"<br/>"+profileValues.description +
+							"<br/>"+profileValues.location +
+							"<br/>"+profileValues.followers + " followers" +
+							"<br/>"+profileValues.following + " following" +
+							"<br/>"+profileValues.tweetcount + " tweets" +
+							"<br/>"+profileValues.lasttweet +
+							"<br/></div>";
+}
 
 
 //create new message function
