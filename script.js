@@ -13,10 +13,15 @@ $(function() {
 		content: function(){
 			var element = $(this);
 			if(element.is("[title]")) {
+				var profileString = "";
 				var userName = element[0].attributes.title.nodeValue;
 				var profileRef = new Firebase(fbUrl+'users/'+userName);
 				
-				return "<div class='miniprofile' style='color:white;background-color:black;'> <b> hello, "+userName +" </b> <img src='twitterlight.png'> </div>";
+				profileRef.once('value',function(snapshot){
+				   profileString = getProfile(snapshot.val());		
+				});
+
+				return profileString;		
 			}
 		}
 	});
@@ -64,20 +69,12 @@ $(document).ready(function(){
 	//enter key message submit
 	$('#chatmessage').keypress(function(event){
 		if(event.keyCode === 13) {
-			//var messageText = $('#chatmessage').val();
-			//if(messageText == '')
-			//	return;
+			var messageText = $('#chatmessage').val();
+			if(messageText == '')
+				return;
 			
-			if($('#chatmessage').val() != '') {
-				$('#chatmessage').profanityFilter({
-					externalSwears:'swearWords.json',
-					replaceWith:'*'
-				});
-				var messageText = $('#chatmessage').val();
 				messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
-				$('#chatmessage').val('')
-			}
-			
+				$('#chatmessage').val('')	
 		}
 	});
 
@@ -126,6 +123,7 @@ messagesRef.limit(10).on('child_added',function(snapshot) {
 	$('#chat').scrollTop($('#chat')[0].scrollHeight);
 });
 
+//return a mini profile for a user.
 var getProfile = function(profileValues){
    return "<div class='miniprofile'> " +
 							"<a href='http://twitter.com/"+profileValues.name+ "'>@"+profileValues.name +"</a>" +
@@ -134,8 +132,8 @@ var getProfile = function(profileValues){
 							"<br/>"+profileValues.followers + " followers" +
 							"<br/>"+profileValues.following + " following" +
 							"<br/>"+profileValues.tweetcount + " tweets" +
-							"<br/>"+profileValues.lasttweet +
-							"<br/></div>";
+							"<br/>Last Tweet: '"+profileValues.lasttweet +
+							"'<br/></div>";
 };
 
 
