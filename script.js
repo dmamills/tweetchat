@@ -74,8 +74,8 @@ $(document).ready(function(){
 				return;
 			
 				messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
-				$('#chatmessage').val('')	
-		}
+				$('#chatmessage').val('');
+			}
 	});
 
 	//logout via button click
@@ -125,15 +125,19 @@ messagesRef.limit(10).on('child_added',function(snapshot) {
 
 //return a mini profile for a user.
 var getProfile = function(profileValues){
-   return "<div class='miniprofile'> " +
-							"<a href='http://twitter.com/"+profileValues.name+ "'>@"+profileValues.name +"</a>" +
-							"<br/>"+profileValues.description +
-							"<br/>"+profileValues.location +
-							"<br/>"+profileValues.followers + " followers" +
-							"<br/>"+profileValues.following + " following" +
-							"<br/>"+profileValues.tweetcount + " tweets" +
-							"<br/>Last Tweet: '"+profileValues.lasttweet +
-							"'<br/></div>";
+
+	if(profileValues != null)
+		   	return "<div class='miniprofile'> " +
+									"@"+profileValues.name +
+									"<br/>"+profileValues.description +
+									"<br/>"+profileValues.location +
+									"<br/>"+profileValues.followers + " followers" +
+									"<br/>"+profileValues.following + " following" +
+									"<br/>"+profileValues.tweetcount + " tweets" +
+									"<br/>Last Tweet: '"+profileValues.lasttweet +
+									"'<br/></div>";
+	else
+		return "<div id='miniprofile'> Sorry user is no longer online </div>";
 };
 
 
