@@ -145,7 +145,7 @@ var getProfile = function(profileValues){
 //create new message function
 var createNewMessage = function(name,picture,message) {
 
- 	var rString = "<div class='message'> <div class='messagetop'> <div class='messageimage'> <a href='http://twitter.com/" + name + "' > <img src='" + picture + "'title='"+name+"'> </div>"
+ 	var rString = "<div class='message'> <div class='messagetop'> <div class='messageimage'> <a href='http://twitter.com/" + name + " ' target='_blank' > <img src='" + picture + "'title='"+name+"'> </div>"
  	+ "<div class='messagename'> " + name+ "</a> </div> </div> <div class='messagetext'> " + message + " </div> </div>";
  	return rString; 
 }
