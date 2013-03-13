@@ -61,6 +61,7 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 
 $(document).ready(function(){
 
+	$('html').niceScroll();
 	$('#chatwrapper').hide();
 	$('#loginbutton').on('click',function() {
 		authClient.login('twitter');
@@ -127,15 +128,15 @@ messagesRef.limit(10).on('child_added',function(snapshot) {
 var getProfile = function(profileValues){
 
 	if(profileValues != null)
-		   	return "<div class='miniprofile'> " +
-									"@"+profileValues.name +
-									"<br/>"+profileValues.description +
-									"<br/>"+profileValues.location +
-									"<br/>"+profileValues.followers + " followers" +
-									"<br/>"+profileValues.following + " following" +
-									"<br/>"+profileValues.tweetcount + " tweets" +
-									"<br/>Last Tweet: '"+profileValues.lasttweet +
-									"'<br/></div>";
+		return "<div class='miniprofile'> " +
+								"@"+profileValues.name +
+								"<br/>"+profileValues.description +
+								"<br/>"+profileValues.location +
+								"<br/>"+profileValues.followers + " followers" +
+								"<br/>"+profileValues.following + " following" +
+								"<br/>"+profileValues.tweetcount + " tweets" +
+								"<br/>Last Tweet: '"+profileValues.lasttweet +
+								"'<br/></div>";
 	else
 		return "<div id='miniprofile'> Sorry user is no longer online </div>";
 };
