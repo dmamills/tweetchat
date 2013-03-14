@@ -61,7 +61,6 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 
 $(document).ready(function(){
 
-	$('html').niceScroll();
 	$('#chatwrapper').hide();
 	$('#loginbutton').on('click',function() {
 		authClient.login('twitter');
@@ -116,12 +115,19 @@ $(document).ready(function(){
  	});
  });
 
-//message added
-messagesRef.limit(10).on('child_added',function(snapshot) {
-	var messageData = snapshot.val();
 
+const MAX_MESSAGES = 30;
+var count = 0;
+//message added
+messagesRef.limit(MAX_MESSAGES).on('child_added',function(snapshot) {
+	var messageData = snapshot.val();
+	count++;
 	$('#chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
 	$('#chat').scrollTop($('#chat')[0].scrollHeight);
+	if(count>MAX_MESSAGES){
+		$('.message').get(0).remove();
+		count--;
+	}
 });
 
 //return a mini profile for a user.
