@@ -74,8 +74,18 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 	}
 });
 
-
 $(document).ready(function(){
+
+	//check for query string for existing room name, else set to default
+	var qs = getParameterByName('room');
+	if(qs != "") {
+		qs = qs.substring(0,t.length-1);
+		$('#roomname').val(qs);
+	} else {
+		$('#roomname').val('default');
+	}
+
+	$('#testquerystring').html(getParameterByName("title"));
 
 	$('#chatwrapper').hide();
 	$('#loginbutton').on('click',function() {
@@ -107,6 +117,15 @@ $(document).ready(function(){
 		$('.message').each(function(){
 			$(this).remove();
 		})
+
+		var tempUserRef = new Firebase(fbUrl+roomName+'/users');
+		tempUserRef.once('value',function(snapshot){
+			var t = snapshot.val();
+			if(t == null && roomName != 'default') {
+				roomRef.remove();
+			}
+		});
+		$('li').remove();
 		messagesRef.off('child_added',onNewMessage)
 		loggedInUser = undefined;
 
@@ -122,7 +141,6 @@ $(document).ready(function(){
 		currentUserRef.remove();
 		
 	});
-
 });
  
 
@@ -143,8 +161,6 @@ var userLogoff = function(snapshot) {
 
 const MAX_MESSAGES = 30;
 var count = 0;
-//message added
-/*messagesRef.limit(MAX_MESSAGES).on('child_added',onNewMessage);*/
 
 var onNewMessage = function(snapshot) {
 	var messageData = snapshot.val();
@@ -156,6 +172,19 @@ var onNewMessage = function(snapshot) {
 			count--;
 		}
 };
+
+//function to get room name from query string.
+function getParameterByName(name)
+{
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.search);
+  if(results == null)
+    return "";
+  else
+    return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
 
 
 //return a mini profile for a user.
