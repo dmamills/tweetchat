@@ -3,8 +3,11 @@ var fbUrl = 'https://tweetchat.firebaseio.com/';
 var loggedInUser;
 
 var firebaseRef = new Firebase(fbUrl);
-var messagesRef = new Firebase(fbUrl + 'messages');
-var userRef = new Firebase(fbUrl + 'users');
+var messagesRef = new Firebase(fbUrl+'default/messages');
+var userRef = new Firebase(fbUrl+'default/users');
+
+var roomName;
+var roomRef;
 
 //showing mini-profile when hovering on message
 $(function() {
@@ -15,7 +18,7 @@ $(function() {
 			if(element.is("[title]")) {
 				var profileString = "";
 				var userName = element[0].attributes.title.nodeValue;
-				var profileRef = new Firebase(fbUrl+'users/'+userName);
+				var profileRef = new Firebase(fbUrl+roomName+'/users/'+userName);
 				
 				profileRef.once('value',function(snapshot){
 				   profileString = getProfile(snapshot.val());		
@@ -36,7 +39,8 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 		//assign to variable to prevent undefined values, which error on firefox
 		var lastTweet = (user.status) ? user.status.text : '';
 
-		userRef.child(user.username).set({ name: user.username, 
+		firebaseRef.child(roomName+'/users/'+user.username).set({
+										   name: user.username, 
 										   profileimage: user.profile_image_url, 
 										   url: user.url,
 										   location: user.location, 
@@ -45,13 +49,25 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 										   following: user.friends_count, 
 										   lasttweet: lastTweet, 
 										   tweetcount: user.statuses_count
-										});		
+		});
+		//set roomRef
+		roomRef = new Firebase(fbUrl+roomName);
 
-		var currentUserRef = new Firebase(fbUrl+'users/'+user.username);
+		//set userRef and events
+		userRef = new Firebase(fbUrl+roomName+'/users');
+		userRef.on('child_added',userLogin);
+		userRef.on('child_removed',userLogoff);
+
+		//set messagesRef and event
+		messagesRef = new Firebase(fbUrl+roomName+'/messages');
+		messagesRef.limit(MAX_MESSAGES).on('child_added',onNewMessage);
+
+		//get currentUserRef for displaying name/room
+		var currentUserRef = new Firebase(fbUrl+roomName+'/users/'+user.username);
 		currentUserRef.once('value',function(snapshot){
 			loggedInUser = snapshot.val();
 
-			$('h3').html("Hello, "+loggedInUser.name).show();
+			$('h3').html("Hello, "+loggedInUser.name + ' you are in room: '+roomName).show();
 			$('#prelogin').hide();
 			$('#chatwrapper').show();
 		});
@@ -63,6 +79,11 @@ $(document).ready(function(){
 
 	$('#chatwrapper').hide();
 	$('#loginbutton').on('click',function() {
+		roomName = $('#roomname').val();
+
+		if(roomName == '')
+			roomName = 'default';
+
 		authClient.login('twitter');
 	});
 
@@ -81,8 +102,12 @@ $(document).ready(function(){
 	//logout via button click
 	$('#logoutbutton').on('click',function(){
 		authClient.logout();
-		var currentUserRef = new Firebase(fbUrl + 'users/'+loggedInUser.name);
+		var currentUserRef = new Firebase(fbUrl +roomName+'/'+ 'users/'+loggedInUser.name);
 		currentUserRef.remove();
+		$('.message').each(function(){
+			$(this).remove();
+		})
+		messagesRef.off('child_added',onNewMessage)
 		loggedInUser = undefined;
 
 		$('h3').text('').hide();
@@ -93,42 +118,45 @@ $(document).ready(function(){
 	//logout via window close
 	$(window).unload(function(){
 		authClient.logout();
-		var currentUserRef = new Firebase(fbUrl + 'users/'+loggedInUser.name);
+		var currentUserRef = new Firebase(fbUrl +roomName+'/'+ 'users/'+loggedInUser.name);
 		currentUserRef.remove();
+		
 	});
 
 });
  
- //user logged on
- userRef.on('child_added',function(snapshot) {
- 	var tempUserData = snapshot.val();
- 	$('ul').append('<li>'+tempUserData.name+'</li>');
- });
 
- //user logged off
- userRef.on('child_removed',function(snapshot){
- 	var tempUserData = snapshot.val();
+var userLogin = function(snapshot) {
+	var tempUserData = snapshot.val();
+ 	$('ul').append('<li>'+tempUserData.name+'</li>');
+};
+
+var userLogoff = function(snapshot) {
+	var tempUserData = snapshot.val();
  		$('li').each(function(){
  		if($(this).text() == tempUserData.name) {
  			$(this).remove();
  		}
  	});
- });
+}
 
 
 const MAX_MESSAGES = 30;
 var count = 0;
 //message added
-messagesRef.limit(MAX_MESSAGES).on('child_added',function(snapshot) {
+/*messagesRef.limit(MAX_MESSAGES).on('child_added',onNewMessage);*/
+
+var onNewMessage = function(snapshot) {
 	var messageData = snapshot.val();
-	count++;
-	$('#chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
-	$('#chat').scrollTop($('#chat')[0].scrollHeight);
-	if(count>MAX_MESSAGES){
-		$('.message').get(0).remove();
-		count--;
-	}
-});
+		count++;
+		$('#chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
+		$('#chat').scrollTop($('#chat')[0].scrollHeight);
+		if(count>MAX_MESSAGES){
+			$('.message').get(0).remove();
+			count--;
+		}
+};
+
 
 //return a mini profile for a user.
 var getProfile = function(profileValues){
