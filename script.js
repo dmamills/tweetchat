@@ -68,6 +68,8 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 			loggedInUser = snapshot.val();
 
 			$('h3').html("Hello, "+loggedInUser.name + ' you are in room: '+roomName).show();
+		    $('.tweetroom').html(createTweetButton());
+		    twttr.widgets.load();
 			$('#prelogin').hide();
 			$('#chatwrapper').show();
 		});
@@ -79,7 +81,7 @@ $(document).ready(function(){
 	//check for query string for existing room name, else set to default
 	var qs = getParameterByName('room');
 	if(qs != "") {
-		qs = qs.substring(0,t.length-1);
+		qs = qs.substring(0,qs.length-1);
 		$('#roomname').val(qs);
 	} else {
 		$('#roomname').val('default');
@@ -125,21 +127,40 @@ $(document).ready(function(){
 				roomRef.remove();
 			}
 		});
-		$('li').remove();
+
 		messagesRef.off('child_added',onNewMessage)
 		loggedInUser = undefined;
-
+		messageRef = null;
+		usersRef = null;
+		$('.tweetroom').html("");
 		$('h3').text('').hide();
 		$('#chatwrapper').hide();
 		$('#prelogin').show();
+		
 	});
 
 	//logout via window close
-	$(window).unload(function(){
+	$(window).unload(function() {
+
 		authClient.logout();
-		var currentUserRef = new Firebase(fbUrl +roomName+'/'+ 'users/'+loggedInUser.name);
-		currentUserRef.remove();
+
+		var testing = new Firebase(fbUrl+roomName+'/users');
+		testing.once('value',function(snap){
+			var t = snap.val()
+		});
+
+		if(loggedInUser != undefined) {
+			var currentUserRef = new Firebase(fbUrl +roomName+'/'+ 'users/'+loggedInUser.name);
+			currentUserRef.remove();
 		
+			var tempuserRef = new Firebase(fbUrl+roomName+'/users');
+			tempUserRef.once('value',function(snapshot){
+				var t = snapshot.val();
+				if(t == null && roomName != 'default')
+					roomRef.remove();
+			});
+		}
+
 	});
 });
  
@@ -157,7 +178,6 @@ var userLogoff = function(snapshot) {
  		}
  	});
 }
-
 
 const MAX_MESSAGES = 30;
 var count = 0;
@@ -186,6 +206,13 @@ function getParameterByName(name)
     return decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+//button to share a firechat room to twitter followers
+var createTweetButton = function() {
+	var url = "127.0.0.1:8000/";
+	return  "<a href='https://twitter.com/share' " +
+		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"' data-lang='en'>Tweet</a> ";
+		    			"fjs.parentNode.insertBefore(js,fjs);}}(document,'script','twitter-wjs');</script>";
+}
 
 //return a mini profile for a user.
 var getProfile = function(profileValues){
@@ -203,7 +230,6 @@ var getProfile = function(profileValues){
 	else
 		return "<div id='miniprofile'> Sorry user is no longer online </div>";
 };
-
 
 //create new message function
 var createNewMessage = function(name,picture,message) {
