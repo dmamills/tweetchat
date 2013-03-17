@@ -16,6 +16,9 @@ $(function() {
 		content: function(){
 			var element = $(this);
 			if(element.is("[title]")) {
+				if(element[0].className == "twitter-share-button twitter-count-horizontal")
+					return;
+
 				var profileString = "";
 				var userName = element[0].attributes.title.nodeValue;
 				var profileRef = new Firebase(fbUrl+roomName+'/users/'+userName);
@@ -82,7 +85,9 @@ $(document).ready(function(){
 	var qs = getParameterByName('room');
 	if(qs != "") {
 		qs = qs.substring(0,qs.length-1);
+
 		$('#roomname').val(qs);
+		$('#roomname').attr('disabled','disabled');
 	} else {
 		$('#roomname').val('default');
 	}
@@ -144,27 +149,20 @@ $(document).ready(function(){
 
 		authClient.logout();
 
-		var testing = new Firebase(fbUrl+roomName+'/users');
-		testing.once('value',function(snap){
-			var t = snap.val()
-		});
-
 		if(loggedInUser != undefined) {
 			var currentUserRef = new Firebase(fbUrl +roomName+'/'+ 'users/'+loggedInUser.name);
 			currentUserRef.remove();
 		
-			var tempuserRef = new Firebase(fbUrl+roomName+'/users');
+			var tempUserRef = new Firebase(fbUrl+roomName+'/users');
 			tempUserRef.once('value',function(snapshot){
 				var t = snapshot.val();
 				if(t == null && roomName != 'default')
 					roomRef.remove();
 			});
 		}
-
 	});
 });
  
-
 var userLogin = function(snapshot) {
 	var tempUserData = snapshot.val();
  	$('ul').append('<li>'+tempUserData.name+'</li>');
@@ -208,10 +206,9 @@ function getParameterByName(name)
 
 //button to share a firechat room to twitter followers
 var createTweetButton = function() {
-	var url = "127.0.0.1:8000/";
+	var url = "http://danielmills.me/tweetchat/";
 	return  "<a href='https://twitter.com/share' " +
-		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"' data-lang='en'>Tweet</a> ";
-		    			"fjs.parentNode.insertBefore(js,fjs);}}(document,'script','twitter-wjs');</script>";
+		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"' data-text='join me in my firechat: ' data-lang='en'>Tweet</a> ";
 }
 
 //return a mini profile for a user.
