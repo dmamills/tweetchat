@@ -39,6 +39,7 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 		console.log(error);
 	} else if(user) {
 
+
 		//assign to variable to prevent undefined values, which error on firefox
 		var lastTweet = (user.status) ? user.status.text : '';
 
@@ -74,7 +75,14 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 		    $('.tweetroom').html(createTweetButton());
 		    twttr.widgets.load();
 			$('#prelogin').hide();
-			$('#chatwrapper').show();
+			
+			//if previously logged out and logging into a new chatroom clear old chat messages
+			messagesRef.once('value',function(snapshot){
+				var t = snapshot.val();
+				if(t == null) 
+					$('#chat').children().remove();	
+			});
+			$('#chatwrapper').fadeIn(500);
 		});
 	}
 });
@@ -85,14 +93,13 @@ $(document).ready(function(){
 	var qs = getParameterByName('room');
 	if(qs != "") {
 		qs = qs.substring(0,qs.length-1);
-
 		$('#roomname').val(qs);
 		$('#roomname').attr('disabled','disabled');
 	} else {
 		$('#roomname').val('default');
 	}
 
-	$('#testquerystring').html(getParameterByName("title"));
+	//$('#testquerystring').html(getParameterByName("title"));
 
 	$('#chatwrapper').hide();
 	$('#loginbutton').on('click',function() {
@@ -118,13 +125,16 @@ $(document).ready(function(){
 
 	//logout via button click
 	$('#logoutbutton').on('click',function(){
+		
 		authClient.logout();
 		var currentUserRef = new Firebase(fbUrl +roomName+'/'+ 'users/'+loggedInUser.name);
 		currentUserRef.remove();
-		$('.message').each(function(){
-			$(this).remove();
-		})
+		
+		messagesRef.off('child_added',onNewMessage);
+		userRef.off('child_added',userLogin);
+		userRef.off('child_removed',userLogoff);
 
+		//test to see if last user, if so delete room
 		var tempUserRef = new Firebase(fbUrl+roomName+'/users');
 		tempUserRef.once('value',function(snapshot){
 			var t = snapshot.val();
@@ -132,15 +142,22 @@ $(document).ready(function(){
 				roomRef.remove();
 			}
 		});
-
-		messagesRef.off('child_added',onNewMessage)
+		
 		loggedInUser = undefined;
 		messageRef = null;
 		usersRef = null;
+
+		$('#chat').children().remove();
+		count = 0;
 		$('.tweetroom').html("");
 		$('h3').text('').hide();
 		$('#chatwrapper').hide();
 		$('#prelogin').show();
+
+		$('li').each(function(){
+			$(this).remove();
+		});
+
 		
 	});
 
@@ -208,7 +225,7 @@ function getParameterByName(name)
 var createTweetButton = function() {
 	var url = "http://danielmills.me/tweetchat/";
 	return  "<a href='https://twitter.com/share' " +
-		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"' data-text='join me in my firechat: ' data-lang='en'>Tweet</a> ";
+		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"' data-text='join me in my firechat: ' data-lang='en'>Tweet</a> <br> http://danielmills.me/tweetchat/?room="+roomName+"<br>";
 }
 
 //return a mini profile for a user.
