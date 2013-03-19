@@ -99,8 +99,6 @@ $(document).ready(function(){
 		$('#roomname').val('default');
 	}
 
-	//$('#testquerystring').html(getParameterByName("title"));
-
 	$('#chatwrapper').hide();
 	$('#loginbutton').on('click',function() {
 		roomName = $('#roomname').val();
@@ -156,9 +154,7 @@ $(document).ready(function(){
 
 		$('li').each(function(){
 			$(this).remove();
-		});
-
-		
+		});	
 	});
 
 	//logout via window close
