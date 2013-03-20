@@ -33,11 +33,12 @@ $(function() {
 	});
 });
 
+
 //user login via twitter
 var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
-	if(error) {
+	if (error) {
 		console.log(error);
-	} else if(user) {
+	} else if (user) {
 
 
 		//assign to variable to prevent undefined values, which error on firefox
@@ -74,15 +75,15 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 			$('h3').html("Hello, "+loggedInUser.name + ' you are in room: '+roomName).show();
 		    $('.tweetroom').html(createTweetButton());
 		    twttr.widgets.load();
-			$('#prelogin').hide();
+			$('.prelogin').hide();
 			
 			//if previously logged out and logging into a new chatroom clear old chat messages
 			messagesRef.once('value',function(snapshot){
 				var t = snapshot.val();
 				if(t == null) 
-					$('#chat').children().remove();	
+					$('.chat').children().remove();	
 			});
-			$('#chatwrapper').fadeIn(500);
+			$('.chatwrapper').fadeIn(500);
 		});
 	}
 });
@@ -92,18 +93,29 @@ $(document).ready(function(){
 	//check for query string for existing room name, else set to default
 	var qs = getParameterByName('room');
 	if(qs != "") {
+
 		qs = qs.substring(0,qs.length-1);
 		$('#roomname').val(qs);
 		$('#roomname').attr('disabled','disabled');
 	} else {
-		$('#roomname').val('default');
+		$('#roomname').val('Enter Room Name');
 	}
 
-	$('#chatwrapper').hide();
+	$('#roomname').on({focus :function(){
+		if(this.value == 'Enter Room Name') 
+			this.value = '';
+	},
+	blur: function(){
+		if(this.value == '')
+			this.value = 'Enter Room Name';
+	}
+	});
+
+	$('.chatwrapper').hide();
 	$('#loginbutton').on('click',function() {
 		roomName = $('#roomname').val();
 
-		if(roomName == '')
+		if(roomName == '' || roomName == 'Enter Room Name')
 			roomName = 'default';
 
 		authClient.login('twitter');
@@ -118,8 +130,8 @@ $(document).ready(function(){
 			
 				messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
 				$('#chatmessage').val('');
-			}
-	});
+		}
+	}); 
 
 	//logout via button click
 	$('#logoutbutton').on('click',function(){
@@ -145,12 +157,12 @@ $(document).ready(function(){
 		messageRef = null;
 		usersRef = null;
 
-		$('#chat').children().remove();
+		$('.chat').children().remove();
 		count = 0;
 		$('.tweetroom').html("");
 		$('h3').text('').hide();
-		$('#chatwrapper').hide();
-		$('#prelogin').show();
+		$('.chatwrapper').hide();
+		$('.prelogin').fadeIn(500);
 
 		$('li').each(function(){
 			$(this).remove();
@@ -196,8 +208,8 @@ var count = 0;
 var onNewMessage = function(snapshot) {
 	var messageData = snapshot.val();
 		count++;
-		$('#chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
-		$('#chat').scrollTop($('#chat')[0].scrollHeight);
+		$('.chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
+		$('.chat').scrollTop($('.chat')[0].scrollHeight);
 		if(count>MAX_MESSAGES){
 			$('.message').get(0).remove();
 			count--;
@@ -221,12 +233,11 @@ function getParameterByName(name)
 var createTweetButton = function() {
 	var url = "http://danielmills.me/tweetchat/";
 	return  "<a href='https://twitter.com/share' " +
-		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"' data-text='join me in my firechat: ' data-lang='en'>Tweet</a> <br> http://danielmills.me/tweetchat/?room="+roomName+"<br>";
+		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"/' data-text='join me in my firechat: ' data-lang='en'>Tweet</a> <br> http://danielmills.me/tweetchat/?room="+roomName+"<br>";
 }
 
 //return a mini profile for a user.
 var getProfile = function(profileValues){
-
 	if(profileValues != null)
 		return "<div class='miniprofile'> " +
 								"@"+profileValues.name +

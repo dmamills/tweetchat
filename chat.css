@@ -1,3 +1,9 @@
+* {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
 body {
 	background-image: url('simple_dashed.png');
 	color:white;
@@ -5,11 +11,33 @@ body {
 	font-family: 'Tauri',sans-serif;
 }
 
-#chatwrapper {
+.intro {
+	max-width:500px;
+	margin: 0 auto;
+	text-align:left;
+}
+
+#roomname {
+	height:28px;
+	width:175px;
+	border-radius:15px;
+	text-align:center;
+	border: 2px solid transparent;;
+}
+
+
+
+#roomname:focus {
+	outline:none;
+	border: 2px solid #6B6B6B ;
+}
+
+.chatwrapper {
 	background-color:white;
 	margin: 0 auto;
 	border: 1px solid black;
-	width: 650px;
+	max-width: 650px;
+	min-width:650px;
 	border-radius: 15px;
 	padding:15px;
 	color:black;
@@ -17,18 +45,19 @@ body {
 	text-align: left;
 }
 
-#chat {
+.chat {
 	margin: 0 auto;
 	border: 1px solid black;
 	background-color:#101012;
 	height: 500px;
 	overflow-y: scroll;
-	width:400px;
+	max-width:400px;
+	min-width:400px;
 	border-radius:15px;
 	float:left;
 }
 
-#userlistwrapper {
+.userlistwrapper {
 	border:1px solid black;
 	border-radius:15px;
 	padding: 0 10px 0 10px;
@@ -39,6 +68,10 @@ body {
 .userlisttop {
 	background-color:#A0A0A0;
 	border-radius:5px 5px 0 0;
+}
+
+.textentered {
+	border:5px solid green;
 }
 
 #chatmessage {

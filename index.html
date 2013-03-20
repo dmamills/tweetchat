@@ -12,21 +12,25 @@
      
 	<title> FireChat</title>
 </head>
-
 <body>
-	<h1> FireChat</h1>
+	<h1>FireChat</h1>
+	<h2></h2>
 	<h3></h3>
-	<div id="prelogin">
-		<img src="twitterlight.png" width="30" height="30" alt="twitter"/>
-		Enter room name desired and login with Twitter<br>
-		<input type='text' id='roomname' value=''>
-    	<input type='button' id='loginbutton' value='Login' />
+	<div class="prelogin">
+		<div class="intro">
+			<p> Welcome to FireChat<br>
+			Tired of hard to follow conversations on twitter?<br> FireChat is a real-time chatting application for you and your twitter friends. <br>Just create a room, share the URL and chat on. When you and your friends leave. The room closes behind you.</p>
+		</div>
+		
+		<br>
+		<input type='text' id='roomname' value=''> and
+		<img src='twittersignin.png' id='loginbutton'>
     </div>
-    <div id="chatwrapper">
-	   <div id="chat">
+    <div class="chatwrapper">
+	   <div class="chat">
 	   </div>
 
-	   <div id="userlistwrapper">
+	   <div class="userlistwrapper">
 	   	 <span class="userlisttop">Users Currently Logged In</span>
 	         <br/> 
 		   	 <ul>
@@ -38,7 +42,7 @@
 	      <br/>
 	      <input type="button" id="logoutbutton" value="Logout">
 	      <br>
-	      <div class="tweetroom">...</div>
+	      <div class="tweetroom"></div>
 	   </div>
 	   <br/>
      </div>
