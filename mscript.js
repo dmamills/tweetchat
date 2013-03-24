@@ -30,10 +30,31 @@ $(document).ready(function(){
 
 	$(window).unload(function(){
 		authClient.logout();
+		var currentUserRef = new Firebase(fbUrl +roomName+'/'+ 'users/'+loggedInUser.name);
+			currentUserRef.remove();
+		
+			var tempUserRef = new Firebase(fbUrl+roomName+'/users');
+			tempUserRef.once('value',function(snapshot){
+				var t = snapshot.val();
+				if(t == null && roomName != 'default')
+					roomRef.remove();
+			});
 	});
 
 	$('#logoutbutton').on('click',function(){
 		authClient.logout();
+		var currentUserRef = new Firebase(fbUrl +roomName+'/'+ 'users/'+loggedInUser.name);
+		currentUserRef.remove();
+		
+		//test to see if last user, if so delete room
+		var tempUserRef = new Firebase(fbUrl+roomName+'/users');
+		tempUserRef.once('value',function(snapshot){
+			var t = snapshot.val();
+			if(t == null && roomName != 'default') {
+				roomRef.remove();
+			}
+		});
+
 		window.location = "mobile.html";
 
 	});
