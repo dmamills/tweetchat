@@ -127,9 +127,17 @@ $(document).ready(function(){
 			var messageText = $('#chatmessage').val();
 			if(messageText == '')
 				return;
-			
-				messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
+
+			if(messageText.length>200) {
 				$('#chatmessage').val('');
+				$('.errormessages').html('Message too long').show().delay(1000).fadeOut(500);
+				return;
+			}
+			
+			messageText = strip(messageText);
+
+			messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
+			$('#chatmessage').val('');
 		}
 	}); 
 
@@ -216,6 +224,34 @@ var onNewMessage = function(snapshot) {
 		}
 };
 
+
+//function check for urls in user message and wrap with anchor tags if needed
+function createAnchors(str) {
+   var arr = str.split(' ');
+    var rStr = "";
+    for(var i =0; i < arr.length;i++) 
+      rStr = rStr + anchorWrap(arr[i]) + " ";
+    return rStr;
+}
+
+//function if string passed contains http:// wrap it in an anchor 
+function anchorWrap(str) {
+    if(str.indexOf('http://')>-1) {
+        return '<a href="'+str+'" target="_blank">'+str+'</a>'   
+    }
+    else 
+        return str;
+}
+
+
+//function to prevent html injection in messages
+function strip(html)
+{
+   var tmp = document.createElement("DIV");
+   tmp.innerHTML = html;
+   return tmp.textContent||tmp.innerText;
+}
+
 //function to get room name from query string.
 function getParameterByName(name)
 {
@@ -230,14 +266,14 @@ function getParameterByName(name)
 }
 
 //button to share a firechat room to twitter followers
-var createTweetButton = function() {
+function createTweetButton() {
 	var url = "http://danielmills.me/tweetchat/";
 	return  "<a href='https://twitter.com/share' " +
 		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"/' data-text='join me in my firechat: ' data-lang='en'>Tweet</a> <br> http://danielmills.me/tweetchat/?room="+roomName+"<br>";
 }
 
 //return a mini profile for a user.
-var getProfile = function(profileValues){
+function getProfile(profileValues){
 	if(profileValues != null)
 		return "<div class='miniprofile'> " +
 								"@"+profileValues.name +
@@ -255,7 +291,7 @@ var getProfile = function(profileValues){
 //create new message function
 var createNewMessage = function(name,picture,message) {
 
- 	var rString = "<div class='message'> <div class='messagetop'> <div class='messageimage'> <a href='http://twitter.com/" + name + " ' target='_blank' > <img src='" + picture + "'title='"+name+"'> </div>"
- 	+ "<div class='messagename'> " + name+ "</a> </div> </div> <div class='messagetext'> " + message + " </div> </div>";
+ 	var rString = "<div class='message cf'> <div class='messageside'> <div class='messageimage'> <a href='http://twitter.com/" + name + " ' target='_blank' > <img src='" + picture + "'title='"+name+"'> </div>"
+ 	+ "<div class='messagename'> " + name+ "</a> </div> </div> <div class='messagetext'> " + createAnchors(message) + " </div>  </div>";
  	return rString; 
 }

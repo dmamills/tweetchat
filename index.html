@@ -1,5 +1,6 @@
-<html>
+<html lang="en">
 <head>
+	<meta charset="utf-8">
 	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 	<link href='http://fonts.googleapis.com/css?family=Tauri' rel='stylesheet' type='text/css'>
 	 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css" />
@@ -16,36 +17,40 @@
 	<h1>FireChat</h1>
 	<h2></h2>
 	<h3></h3>
+
+	<!-- Splash/Login  -->
 	<div class="prelogin">
 		<div class="intro">
-			<p> Welcome to FireChat<br>
-			Tired of hard to follow conversations on twitter?<br> FireChat is a real-time chatting application for you and your twitter friends. <br>Just create a room, share the URL and chat on. When you and your friends leave. The room closes behind you.</p>
+			<p> <h3>Welcome to FireChat</h3><br>
+			Tired of hard to follow conversations on twitter?<br> FireChat is a realtime chatting application for you and your twitter friends. <br>Just create a room, share the URL and chat on.<br> When you and your friends leave, the room closes behind you.</p>
 		</div>
 		
 		<br>
-		<input type='text' id='roomname' value=''> and
+		<input type='text' id='roomname' value=''> <br>
 		<img src='twittersignin.png' id='loginbutton'>
     </div>
+
+    <!-- Chat -->
     <div class="chatwrapper">
-	   <div class="chat">
-	   </div>
+	   <div class="chat"></div>
 
 	   <div class="userlistwrapper">
-	   	 <span class="userlisttop">Users Currently Logged In</span>
-	         <br/> 
-		   	 <ul>
-		   	 </ul>
+	   	 <div class="userlisttop">Users Currently Logged In</div>
+	         <br> 
+		   	 <ul></ul>
 	   </div>
 	  
 	   <div class="textenter">
 	      <input type="text" id="chatmessage" >
-	      <br/>
+	      <br>
+	      <div class="errorwrapper"><div class="errormessages"></div></div>
+	      <br>
 	      <input type="button" id="logoutbutton" value="Logout">
 	      <br>
 	      <div class="tweetroom"></div>
 	   </div>
-	   <br/>
+	   <br>
      </div>
-    <footer> Made by <a href="http://about.me/danielmills">Daniel Mills</a>  Powered by <a href="http://firebase.com">Firebase</a> Background provided by <a href="http://subtlepatterns.com"> Subtle Patterns</a> </footer>
+    <footer> Made by <a href="http://danielmills.me">Daniel Mills</a>  Powered by <a href="http://firebase.com">Firebase</a></footer>
 </body>
 </html>

@@ -11,6 +11,25 @@ body {
 	font-family: 'Tauri',sans-serif;
 }
 
+.prelogin {
+    border-radius:15px;
+	max-width:650px;
+	min-width:650px;
+	height:325px;
+	padding:10px;
+	margin: 0 auto;
+	background-color:#FFF;
+	color:#1B1B1B;
+}
+
+img#loginbutton{
+	margin-top:10px;
+}
+
+img#loginbutton:hover {
+	cursor:pointer;
+}
+
 .intro {
 	max-width:500px;
 	margin: 0 auto;
@@ -20,16 +39,17 @@ body {
 #roomname {
 	height:28px;
 	width:175px;
-	border-radius:15px;
+	border-radius:5px;
 	text-align:center;
-	border: 2px solid transparent;;
+	color:#BDBDBD;
+	border: 2px solid #6B6B6B;
 }
 
 
 
 #roomname:focus {
 	outline:none;
-	border: 2px solid #6B6B6B ;
+	border: 2px solid #A1E5F4 ;
 }
 
 .chatwrapper {
@@ -60,14 +80,15 @@ body {
 .userlistwrapper {
 	border:1px solid black;
 	border-radius:15px;
-	padding: 0 10px 0 10px;
 	float:right;
 	height:500px;
 }
 
 .userlisttop {
 	background-color:#A0A0A0;
-	border-radius:5px 5px 0 0;
+	padding:10px;
+	border-bottom:1px solid black;
+	border-radius:15px 15px 0 0;
 }
 
 .textentered {
@@ -95,19 +116,25 @@ body {
 	margin: 1px 5px 1px 5px;
 	padding:5px;
 	border-radius: 15px;
+	/*  clearfix? */
 }
 
 .newmessage {
 	background-color:black;
 }
 
-.messagetop {
-	border:1px solid #A19EA9;
+.messageside {
+	float:left;
 	border-radius:15px;
 	padding: 5px 0 10px 10px;
 }
 
+.messagename a {
+	text-decoration: none;
+}
+
 .messagetext {
+	padding-left:10px;
 	padding-top:5px;
 	word-wrap:break-word;
 	color: #141316;
@@ -116,6 +143,18 @@ body {
 .messageimg img {
 	border:1px solid #141316;
 }
+
+.cf:before, .cf:after { content: ""; display: table; }
+.cf:after { clear: both; }
+.cf { zoom: 1; }
+
+.errormessages {
+	color:#E72727;
+}
+.errorwrapper {
+	height:5px;
+}
+
 img {
 	border-radius:10px;
 }
@@ -145,6 +184,7 @@ footer a:visited{
 }
 
 .miniprofile {
+	padding:10px;
 	background-color:#141316;
 	color:#CFCFCF;
 	opacity: 0.8;
