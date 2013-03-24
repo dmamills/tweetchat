@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>FireChat</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href='http://fonts.googleapis.com/css?family=Tauri' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.css" />
+	<script type='text/javascript' src='https://cdn.firebase.com/v0/firebase.js'></script>
+	<script type='text/javascript' src='https://cdn.firebase.com/v0/firebase-auth-client.js'></script>
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js"></script>
+	<link rel="stylesheet"  type="text/css" href="mchat.css" >
+	<script src="func.js"></script>
+	<script src="mscript.js"></script>
+</head>
+<body>
+
+<!-- Start of first page -->
+<div data-role="page" id="foo">
+
+	<div data-role="header">
+		<h1>FireChat</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">
+		<h3>Welcome to Firechat</h3>
+		<p>
+			Tired of hard to follow conversations on twitter?<br> FireChat is a realtime chatting application for you and your twitter friends. <br>Just create a room, share the URL and chat on.<br> When you and your friends leave, the room closes behind you.
+		</p>
+
+			<input type='text' id='roomname' value=''> <br>
+			<img src='twittersignin.png' id='loginbutton'>
+		<!--<p>View internal page called <a href="#bar">bar</a></p> -->
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Created by Daniel Mills</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+
+<!-- Start of second page -->
+<div data-role="page" id="bar">
+
+	<div data-role="header">
+		<h1>FireChat</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">
+		<div class="chatwrapper">
+			<div class="chatheader"></div>
+			<div class="chat"> </div>
+			<div class="textenter">
+				<input type="text" id="chatmessage">
+				<div class="errorwrapper">
+					<div class="errormessages"></div>
+				</div>
+			</div>
+
+			<div class="userlistwrapper">
+				<div class="userlisttop">Users currently logged in</div>
+				<br>
+				<ul></ul>
+			</div>
+
+		</div>
+		<div class="bottombuttons">
+			<input type='button' value='Logout' id='logoutbutton'>
+			<div class="tweetroom"></div>
+		</div>
+	</div><!-- /content -->
+
+	<div data-role="footer">
+		<h4>Created by Daniel Mills</h4>
+	</div><!-- /footer -->
+</div><!-- /page -->
+</body>
+</html>

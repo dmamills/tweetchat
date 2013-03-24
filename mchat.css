@@ -1,0 +1,83 @@
+
+body {
+	background-image: url('simple_dashed.png');
+	color:white;
+	text-align:center;
+	font-family: 'Tauri',sans-serif;
+}
+
+
+
+.chatwrapper {
+
+}
+
+.chat {
+	margin:0 auto;
+	min-width:80%;
+	min-height:300px;
+	border-radius:15px;
+	border:1px solid black;
+	background-color:black;
+	overflow:scroll;
+}
+
+.errorwrapper {
+	height:5px;
+}
+
+.errormessages{
+	color:#E72727;
+}
+.message {
+	background-color:#FFFFFF;
+	border: 1px solid #1D1C20;
+	margin: 1px 5px 1px 5px;
+	padding:5px;
+	border-radius: 15px;
+	/*  clearfix? */
+}
+
+.newmessage {
+	background-color:black;
+}
+
+.messageside {
+	float:left;
+	border-radius:15px;
+	padding: 5px 0 10px 10px;
+}
+
+.messagename a {
+	text-decoration: none;
+}
+
+.messagetext {
+	padding-left:10px;
+	padding-top:5px;
+	word-wrap:break-word;
+	color: #141316;
+}
+
+.messageimg img {
+	border:1px solid #141316;
+}
+
+.cf:before, .cf:after { content: ""; display: table; }
+.cf:after { clear: both; }
+.cf { zoom: 1; }
+
+
+.userlistwrapper{
+
+}
+
+.userlisttop {
+
+}
+
+
+
+.messageside {
+
+}

@@ -40,7 +40,6 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 		console.log(error);
 	} else if (user) {
 
-
 		//assign to variable to prevent undefined values, which error on firefox
 		var lastTweet = (user.status) ? user.status.text : '';
 
@@ -93,13 +92,17 @@ $(document).ready(function(){
 	//check for query string for existing room name, else set to default
 	var qs = getParameterByName('room');
 	if(qs != "") {
-
 		qs = qs.substring(0,qs.length-1);
 		$('#roomname').val(qs);
 		$('#roomname').attr('disabled','disabled');
 	} else {
 		$('#roomname').val('Enter Room Name');
 	}
+
+	if(isMobile.any()) {
+		window.location = "mobile.html";
+	}
+
 
 	$('#roomname').on({focus :function(){
 		if(this.value == 'Enter Room Name') 
@@ -135,7 +138,6 @@ $(document).ready(function(){
 			}
 			
 			messageText = strip(messageText);
-
 			messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
 			$('#chatmessage').val('');
 		}
@@ -223,47 +225,6 @@ var onNewMessage = function(snapshot) {
 			count--;
 		}
 };
-
-
-//function check for urls in user message and wrap with anchor tags if needed
-function createAnchors(str) {
-   var arr = str.split(' ');
-    var rStr = "";
-    for(var i =0; i < arr.length;i++) 
-      rStr = rStr + anchorWrap(arr[i]) + " ";
-    return rStr;
-}
-
-//function if string passed contains http:// wrap it in an anchor 
-function anchorWrap(str) {
-    if(str.indexOf('http://')>-1) {
-        return '<a href="'+str+'" target="_blank">'+str+'</a>'   
-    }
-    else 
-        return str;
-}
-
-
-//function to prevent html injection in messages
-function strip(html)
-{
-   var tmp = document.createElement("DIV");
-   tmp.innerHTML = html;
-   return tmp.textContent||tmp.innerText;
-}
-
-//function to get room name from query string.
-function getParameterByName(name)
-{
-  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-  var regexS = "[\\?&]" + name + "=([^&#]*)";
-  var regex = new RegExp(regexS);
-  var results = regex.exec(window.location.search);
-  if(results == null)
-    return "";
-  else
-    return decodeURIComponent(results[1].replace(/\+/g, " "));
-}
 
 //button to share a firechat room to twitter followers
 function createTweetButton() {
