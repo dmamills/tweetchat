@@ -102,11 +102,11 @@ img#loginbutton:hover {
 	border-radius:5px;
 }
 
-.messagetop a {
+.messageside a {
 	text-decoration: none;
 	color:#3c3a43;
 }
-.messagetop a:hover {
+.messageside a:hover {
 	color:#1E1D22;
 }
 
