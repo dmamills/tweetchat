@@ -47,6 +47,7 @@ body {
 }
 
 .messagename a {
+	color:#2c3e50;
 	text-decoration: none;
 }
 
@@ -65,15 +66,10 @@ body {
 .cf:after { clear: both; }
 .cf { zoom: 1; }
 
-
-.userlistwrapper{
-
+.user {
+	list-style-type: none;
+	text-align:left;
 }
-
-.userlisttop {
-
-}
-
 
 
 .messageside {
