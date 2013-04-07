@@ -8,7 +8,7 @@ var userRef = new Firebase(fbUrl+'default/users');
 var roomName;
 var roomRef;
 
-$(document).ready(function(){
+$(document).ready(function() {
 
 	var location = window.location.href;
 	if(location.indexOf('#bar') >-1){
@@ -77,6 +77,21 @@ $(document).ready(function(){
 			$('#chatmessage').val('');
 		}
 	}); 
+   
+	//change message limit 
+    $('#sliderWrap').on('slidestop',function(){
+    	var value = $('#messageLimit').val();
+        
+        MAX_MESSAGES = parseInt(value);
+		console.log('new limit: '+value + ' MAX: '+MAX_MESSAGES);
+        messagesRef.off('child_added');
+        $('.message').each(function(){ 
+        	$(this).remove();
+        });
+        count = 0;
+        messagesRef.limit(MAX_MESSAGES).on('child_added',onNewMessage);
+    });
+
 });
 
 var authClient = new FirebaseAuthClient(firebaseRef,function(error,user) {
@@ -84,11 +99,9 @@ var authClient = new FirebaseAuthClient(firebaseRef,function(error,user) {
 		console.log(error);
 	} else if(user){
 
-		console.log('logged in!');
-
 		var lastTweet = (user.status) ? user.status.text : '';
 
-			firebaseRef.child(roomName+'/users/'+user.username).set({
+		firebaseRef.child(roomName+'/users/'+user.username).set({
 										   name: user.username, 
 										   profileimage: user.profile_image_url, 
 										   url: user.url,
@@ -114,7 +127,7 @@ var authClient = new FirebaseAuthClient(firebaseRef,function(error,user) {
 		currentUserRef.once('value',function(s){
 			loggedInUser = s.val();
 			
-			$('.chatheader').html("Hello "+loggedInUser.name +"you are in room: "+roomName);
+			$('.chatheader').html("Hello "+loggedInUser.name +" you are in room: "+roomName);
 			
 			//create tweetbutton, call twttr.widgets.load();
 			window.location = window.location+'#bar';
@@ -137,7 +150,7 @@ function userLogoff(snapshot){
 	 	});
 }
 
-const MAX_MESSAGES = 30;
+var MAX_MESSAGES = 10;
 var count = 0;
 
 function onNewMessage(snapshot){
