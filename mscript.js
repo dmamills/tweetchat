@@ -150,7 +150,7 @@ function userLogoff(snapshot){
 	 	});
 }
 
-var MAX_MESSAGES = 10;
+var MAX_MESSAGES = 5;
 var count = 0;
 
 function onNewMessage(snapshot){
