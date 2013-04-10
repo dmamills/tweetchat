@@ -1,5 +1,4 @@
-
-var fbUrl = 'https://tweetchat.firebaseio.com/';
+var fbUrl = '' // enter firebase url
 var loggedInUser;
 
 var firebaseRef = new Firebase(fbUrl);
