@@ -73,11 +73,14 @@ $(document).ready(function() {
 			}
 			
 			messageText = strip(messageText);
-			messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
+			var d = new Date();
+			var newMessageRef = new Firebase(fbUrl+roomName+'/messages/'+d.getTime());
+			newMessageRef.set({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
 			$('#chatmessage').val('');
 		}
 	}); 
    
+
 	//change message limit 
     $('#sliderWrap').on('slidestop',function(){
     	var value = $('#messageLimit').val();
@@ -89,7 +92,9 @@ $(document).ready(function() {
         	$(this).remove();
         });
         count = 0;
-        messagesRef.limit(MAX_MESSAGES).on('child_added',onNewMessage);
+        var d = new Date();
+
+        messagesRef.endAt(d.getTime()).limit(MAX_MESSAGES).on('child_added',onNewMessage);
     });
 
 });
@@ -158,7 +163,8 @@ function onNewMessage(snapshot){
 	count++;
 
 	$('.chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
-	$('.chat').scrollTop($('.chat')[0].scrollHeight);
+	
+	//$('.chat').scrollTop($('.chat')[0].scrollHeight);
 	if(count>MAX_MESSAGES){
 		$('.message').get(0).remove();
 		count--;
