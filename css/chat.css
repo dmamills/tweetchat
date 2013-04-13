@@ -5,7 +5,7 @@
 }
 
 body {
-	background-image: url('simple_dashed.png');
+	background-image: url('../images/simple_dashed.png');
 	color:white;
 	text-align:center;
 	font-family: 'Tauri',sans-serif;
