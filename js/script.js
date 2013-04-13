@@ -138,7 +138,9 @@ $(document).ready(function(){
 			}
 			
 			messageText = strip(messageText);
-			messagesRef.push({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
+			var d = new Date();
+			var newMessageRef = new Firebase(fbUrl+roomName+'/messages/'+d.getTime());
+			newMessageRef.set({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
 			$('#chatmessage').val('');
 		}
 	}); 
