@@ -56,7 +56,6 @@ $(document).ready(function() {
 		});
 
 		window.location = "mobile.html";
-
 	});
 
 	//enter key message submit
@@ -75,23 +74,26 @@ $(document).ready(function() {
 			messageText = strip(messageText);
 			var d = new Date();
 			var newMessageRef = new Firebase(fbUrl+roomName+'/messages/'+d.getTime());
-			newMessageRef.set({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
+			newMessageRef.set({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText,ts:d.getTime()});
 			$('#chatmessage').val('');
 		}
 	}); 
    
-
+   	
 	//change message limit 
     $('#sliderWrap').on('slidestop',function(){
-    	var value = $('#messageLimit').val();
+    	var value = parseInt($('#messageLimit').val());
         
-        MAX_MESSAGES = parseInt(value);
+        if(value > MAX_MESSAGES)
+        	maxDifference = value - MAX_MESSAGES;
+
+        MAX_MESSAGES = value;
 		console.log('new limit: '+value + ' MAX: '+MAX_MESSAGES);
         messagesRef.off('child_added');
-        $('.message').each(function(){ 
+	    $('.message').each(function(){ 
         	$(this).remove();
         });
-        count = 0;
+        count = 0; 
         var d = new Date();
 
         messagesRef.endAt(d.getTime()).limit(MAX_MESSAGES).on('child_added',onNewMessage);
@@ -154,25 +156,37 @@ function userLogoff(snapshot){
 	 		}
 	 	});
 }
-
+var maxDifference = 0;
 var MAX_MESSAGES = 5;
 var count = 0;
+var prependArray = [];
 
 function onNewMessage(snapshot){
 	var messageData = snapshot.val();
 	count++;
-
-	$('.chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
 	
-	//$('.chat').scrollTop($('.chat')[0].scrollHeight);
+	if(maxDifference > 0 && count > MAX_MESSAGES-maxDifference) {
+		prependArray.push(createNewMessage(messageData.name,messageData.picture,messageData.message,messageData.ts));
+
+		maxDifference--;
+		if(maxDifference == 0) {
+			prependArray.reverse();
+			for(var i =0; i < prependArray.length;i++) {
+				$('.chat').prepend(x[i]);
+			}
+			prependArray= [];
+		}
+	} else {
+		$('.chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message,messageData.ts));
+	}
 	if(count>MAX_MESSAGES){
 		$('.message').get(0).remove();
 		count--;
 	}
 }
 
-function createNewMessage(name,picture,message){
- 	var rString = "<div class='message cf'> <div class='messageside'> <div class='messageimage'> <a href='http://twitter.com/" + name + " ' target='_blank' > <img src='" + picture + "'title='"+name+"'> </div>"
+function createNewMessage(name,picture,message,ts){
+ 	var rString = "<div class='message cf'><div id='ts' style='display:none;'>"+ts+"</div>  <div class='messageside'> <div class='messageimage'> <a href='http://twitter.com/" + name + " ' target='_blank' > <img src='" + picture + "'title='"+name+"'> </div>"
  	+ "<div class='messagename'> " + name+ "</a> </div> </div> <div class='messagetext'> " + createAnchors(message) + " </div>  </div>";
  	return rString; 
 }
