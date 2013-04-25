@@ -1,4 +1,3 @@
-
 var fbUrl = 'https://tweetchat.firebaseio.com/';
 var loggedInUser;
 
@@ -24,7 +23,7 @@ $(function() {
 				var profileRef = new Firebase(fbUrl+roomName+'/users/'+userName);
 				
 				profileRef.once('value',function(snapshot){
-				   profileString = getProfile(snapshot.val());		
+				   profileString = tweetChat.getProfile(snapshot.val());		
 				});
 
 				return profileString;		
@@ -64,7 +63,7 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 
 		//set messagesRef and event
 		messagesRef = new Firebase(fbUrl+roomName+'/messages');
-		messagesRef.limit(MAX_MESSAGES).on('child_added',onNewMessage);
+		messagesRef.limit(MAX_MESSAGES).on('child_added',tweetChat.onNewMessage);
 
 		//get currentUserRef for displaying name/room
 		var currentUserRef = new Firebase(fbUrl+roomName+'/users/'+user.username);
@@ -72,7 +71,7 @@ var authClient = new FirebaseAuthClient(firebaseRef, function(error, user) {
 			loggedInUser = snapshot.val();
 
 			$('h3').html("Hello, "+loggedInUser.name + ' you are in room: '+roomName).show();
-		    $('.tweetroom').html(createTweetButton());
+		    $('.tweetroom').html(tweetChat.createTweetButton());
 		    twttr.widgets.load();
 			$('.prelogin').hide();
 			
@@ -103,15 +102,14 @@ $(document).ready(function(){
 		window.location = "mobile.html";
 	}
 
-
 	$('#roomname').on({focus :function(){
 		if(this.value == 'Enter Room Name') 
 			this.value = '';
-	},
-	blur: function(){
-		if(this.value == '')
-			this.value = 'Enter Room Name';
-	}
+		},
+		blur: function(){
+			if(this.value == '')
+				this.value = 'Enter Room Name';
+		}
 	});
 
 	$('.chatwrapper').hide();
@@ -122,28 +120,10 @@ $(document).ready(function(){
 			roomName = 'default';
 
 		authClient.login('twitter');
-	});
+	});  
 
 	//enter key message submit
-	$('#chatmessage').keypress(function(event){
-		if(event.keyCode === 13) {
-			var messageText = $('#chatmessage').val();
-			if(messageText == '')
-				return;
-
-			if(messageText.length>200) {
-				$('#chatmessage').val('');
-				$('.errormessages').html('Message too long').show().delay(1000).fadeOut(500);
-				return;
-			}
-			
-			messageText = strip(messageText);
-			var d = new Date();
-			var newMessageRef = new Firebase(fbUrl+roomName+'/messages/'+d.getTime());
-			newMessageRef.set({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
-			$('#chatmessage').val('');
-		}
-	}); 
+	$('#chatmessage').keypress(tweetChat.keyPressEvent); 
 
 	//logout via button click
 	$('#logoutbutton').on('click',function(){
@@ -152,7 +132,7 @@ $(document).ready(function(){
 		var currentUserRef = new Firebase(fbUrl +roomName+'/'+ 'users/'+loggedInUser.name);
 		currentUserRef.remove();
 		
-		messagesRef.off('child_added',onNewMessage);
+		messagesRef.off('child_added',tweetChat.onNewMessage);
 		userRef.off('child_added',userLogin);
 		userRef.off('child_removed',userLogoff);
 
@@ -200,6 +180,77 @@ $(document).ready(function(){
 	});
 });
  
+var tweetChat = (function($) {
+
+    	function keyPressEvent(e){
+    		if(e.keyCode === 13) {
+				var messageText = $('#chatmessage').val();
+					if(messageText == '')
+						return;
+	
+				if(messageText.length>200) {
+					$('#chatmessage').val('');
+					$('.errormessages').html('Message too long').show().delay(1000).fadeOut(500);
+					return;
+				}
+				messageText = strip(messageText);
+				var d = new Date();
+				var newMessageRef = new Firebase(fbUrl+roomName+'/messages/'+d.getTime());
+				newMessageRef.set({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
+				$('#chatmessage').val('');
+			}
+		};
+
+		function createTweetButton() {
+			var url = "http://danielmills.me/tweetchat/";
+			return  "<a href='https://twitter.com/share' " +
+		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"/' data-text='join me in my firechat: ' data-lang='en'>Tweet</a> <br> http://danielmills.me/tweetchat/?room="+roomName+"<br>";
+		};
+
+		//return a mini profile for a user.
+		function getProfile(profileValues){
+			if(profileValues != null)
+				return "<div class='miniprofile'> " +
+										"@"+profileValues.name +
+										"<br/>"+profileValues.description +
+										"<br/>"+profileValues.location +
+										"<br/>"+profileValues.followers + " followers" +
+										"<br/>"+profileValues.following + " following" +
+										"<br/>"+profileValues.tweetcount + " tweets" +
+										"<br/>Last Tweet: '"+profileValues.lasttweet +
+										"'<br/></div>";
+			else
+				return "<div id='miniprofile'> Sorry user is no longer online </div>";
+		};
+		
+		//create new message function
+		function createNewMessage(name,picture,message) {
+		
+		 	var rString = "<div class='message cf'> <div class='messageside'> <div class='messageimage'> <a href='http://twitter.com/" + name + " ' target='_blank' > <img src='" + picture + "'title='"+name+"'> </div>"
+		 	+ "<div class='messagename'> " + name+ "</a> </div> </div> <div class='messagetext'> " + createAnchors(message) + " </div>  </div>";
+		 	return rString; 
+		};
+
+		function onNewMessage(snapshot) {
+			var messageData = snapshot.val();
+			count++;
+			$('.chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
+			$('.chat').scrollTop($('.chat')[0].scrollHeight);
+			if(count>MAX_MESSAGES){
+				$('.message').get(0).remove();
+				count--;
+			};
+		};	
+    	return {
+    		keyPressEvent:keyPressEvent,
+    		createTweetButton:createTweetButton,
+    		getProfile:getProfile,
+    		onNewMessage:onNewMessage
+    	};
+
+ }(jQuery) );
+
+
 var userLogin = function(snapshot) {
 	var tempUserData = snapshot.val();
  	$('ul').append('<li>'+tempUserData.name+'</li>');
@@ -217,44 +268,4 @@ var userLogoff = function(snapshot) {
 const MAX_MESSAGES = 30;
 var count = 0;
 
-var onNewMessage = function(snapshot) {
-	var messageData = snapshot.val();
-		count++;
-		$('.chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
-		$('.chat').scrollTop($('.chat')[0].scrollHeight);
-		if(count>MAX_MESSAGES){
-			$('.message').get(0).remove();
-			count--;
-		}
-};
-
 //button to share a firechat room to twitter followers
-function createTweetButton() {
-	var url = "http://danielmills.me/tweetchat/";
-	return  "<a href='https://twitter.com/share' " +
-		    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"/' data-text='join me in my firechat: ' data-lang='en'>Tweet</a> <br> http://danielmills.me/tweetchat/?room="+roomName+"<br>";
-}
-
-//return a mini profile for a user.
-function getProfile(profileValues){
-	if(profileValues != null)
-		return "<div class='miniprofile'> " +
-								"@"+profileValues.name +
-								"<br/>"+profileValues.description +
-								"<br/>"+profileValues.location +
-								"<br/>"+profileValues.followers + " followers" +
-								"<br/>"+profileValues.following + " following" +
-								"<br/>"+profileValues.tweetcount + " tweets" +
-								"<br/>Last Tweet: '"+profileValues.lasttweet +
-								"'<br/></div>";
-	else
-		return "<div id='miniprofile'> Sorry user is no longer online </div>";
-};
-
-//create new message function
-var createNewMessage = function(name,picture,message) {
-
- 	var rString = "<div class='message cf'> <div class='messageside'> <div class='messageimage'> <a href='http://twitter.com/" + name + " ' target='_blank' > <img src='" + picture + "'title='"+name+"'> </div>"
- 	+ "<div class='messagename'> " + name+ "</a> </div> </div> <div class='messagetext'> " + createAnchors(message) + " </div>  </div>";
- 	return rString; 
-}
