@@ -10,13 +10,8 @@ $(function() {
 
 				var profileString = "";
 				var userName = element[0].attributes.title.nodeValue;
-				var profileRef = new Firebase(tweetChat.getProfileRefString(userName));
+				return tweetChat.getProfile(userName);
 				
-				profileRef.once('value',function(snapshot){
-				   profileString = tweetChat.getProfile(snapshot.val());		
-				});
-
-				return profileString;		
 			}
 		}
 	});
@@ -57,16 +52,11 @@ $(document).ready(function(){
 			name = 'default';
 
 		tweetChat.login(name);
-		tweetChat.authClient.login('twitter');
 	});  
 
-	//enter key message submit
+	//bind event handlers to page
 	$('#chatmessage').keypress(tweetChat.keyPressEvent); 
-
-	//logout via button click
 	$('#logoutbutton').on('click',tweetChat.logoutButton);
-
-	//logout via window close
 	$(window).unload(tweetChat.unload);
 });
  
@@ -80,17 +70,21 @@ var tweetChat = (function($) {
 
 
 	function getProfileRefString(userName){
-		return fbUrl+roomName+'/users/'+userName;
-	}
+		var profileRef = new Firebase(fbUrl+roomName+'/users/'+userName);	
+		profileRef.once('value',function(snapshot){
+			return snapshot.val();		
+		});
+	};
+
 	function logoutButton(){
 		authClient.logout();
 		logoutButtonCleanup();
-	}
+	};
 
 	function unload(){
 		authClient.logout();
 		windowCloseCleanup();
-	}
+	};
 
 	function logoutButtonCleanup(){
 		
@@ -98,8 +92,8 @@ var tweetChat = (function($) {
 		currentUserRef.remove();
 		
 		messagesRef.off('child_added',tweetChat.onNewMessage);
-		userRef.off('child_added',tweetChat.userLogin);
-		userRef.off('child_removed',tweetChat.userLogoff);
+		userRef.off('child_added',userLogin);
+		userRef.off('child_removed',userLogoff);
 
 		//test to see if last user, if so delete room
 		var tempUserRef = new Firebase(fbUrl+roomName+'/users');
@@ -124,7 +118,7 @@ var tweetChat = (function($) {
 		$('li').each(function(){
 			$(this).remove();
 		});	
-	}
+	};
 
 	function windowCloseCleanup(){
 		if(loggedInUser != undefined) {
@@ -138,13 +132,13 @@ var tweetChat = (function($) {
 					roomRef.remove();
 			});
 		}
-	}
+	};
 
 
 	function login(name){
 		roomName = name;
 		authClient.login('twitter');
-	}
+	};
 
 	function createUser(user){
 		var lastTweet = (user.status) ? user.status.text : '';
@@ -159,7 +153,7 @@ var tweetChat = (function($) {
 										   lasttweet: lastTweet, 
 										   tweetcount: user.statuses_count
 		});
-	}
+	};
 
 	function keyPressEvent(e){
 		var chatMessage = $('#chatmessage');
@@ -189,6 +183,9 @@ var tweetChat = (function($) {
 
 	//return a mini profile for a user.
 	function getProfile(profileValues){
+
+				
+
 		if(profileValues != null)
 			return "<div class='miniprofile'> " +
 									"@"+profileValues.name +
@@ -245,24 +242,25 @@ var tweetChat = (function($) {
 	
 			createUser(user);
 			//set roomRef
-			roomRef = new Firebase(fbUrl+roomName);
+			var roomUrl = fbUrl+roomName;
+			roomRef = new Firebase(roomUrl);
 	
 			//set userRef and events
-			userRef = new Firebase(fbUrl+roomName+'/users');
-			userRef.on('child_added',tweetChat.userLogin);
-			userRef.on('child_removed',tweetChat.userLogoff);
+			userRef = new Firebase(roomUrl+'/users');
+			userRef.on('child_added',userLogin);
+			userRef.on('child_removed',userLogoff);
 	
 			//set messagesRef and event
 			messagesRef = new Firebase(fbUrl+roomName+'/messages');
-			messagesRef.limit(MAX_MESSAGES).on('child_added',tweetChat.onNewMessage);
+			messagesRef.limit(MAX_MESSAGES).on('child_added',onNewMessage);
 	
 			//get currentUserRef for displaying name/room
-			var currentUserRef = new Firebase(fbUrl+roomName+'/users/'+user.username);
+			var currentUserRef = new Firebase(roomUrl+'/users/'+user.username);
 			currentUserRef.once('value',function(snapshot){
 				loggedInUser = snapshot.val();
 	
 				$('h3').html("Hello, "+loggedInUser.name + ' you are in room: '+roomName).show();
-			    $('.tweetroom').html(tweetChat.createTweetButton());
+			    $('.tweetroom').html(createTweetButton());
 			    twttr.widgets.load();
 				$('.prelogin').hide();
 				
@@ -279,13 +277,9 @@ var tweetChat = (function($) {
 
 	return {
 		keyPressEvent:keyPressEvent,
-		createTweetButton:createTweetButton,
 		getProfile:getProfile,
 		onNewMessage:onNewMessage,
-		userLogin:userLogin,
-		userLogoff:userLogoff,
 		login:login,
-		authClient:authClient,
 		getProfileRefString:getProfileRefString,
 		logoutButton:logoutButton,
 		unload:unload
