@@ -10,8 +10,7 @@ $(function() {
 
 				var profileString = "";
 				var userName = element[0].attributes.title.nodeValue;
-				return tweetChat.getProfile(userName);
-				
+				return tweetChat.getProfile(userName);		
 			}
 		}
 	});
@@ -68,13 +67,6 @@ var tweetChat = (function($) {
 	var roomName,userRef, messagesRef, roomRef,loggedInUser;
 	var firebaseRef = new Firebase(fbUrl);
 
-
-	function getProfileRefString(userName){
-		var profileRef = new Firebase(fbUrl+roomName+'/users/'+userName);	
-		profileRef.once('value',function(snapshot){
-			return snapshot.val();		
-		});
-	};
 
 	function logoutButton(){
 		authClient.logout();
@@ -181,11 +173,20 @@ var tweetChat = (function($) {
 	    "class='twitter-share-button' data-url='"+url+"?room="+roomName+"/' data-text='join me in my firechat: ' data-lang='en'>Tweet</a> <br> http://danielmills.me/tweetchat/?room="+roomName+"<br>";
 	};
 
+	function getProfileData(userName){
+		var data;
+		var profileRef = new Firebase(fbUrl+roomName+'/users/'+userName);	
+		profileRef.once('value',function(snapshot){
+			data = snapshot.val();		
+		});
+		return data;
+	};
+
 	//return a mini profile for a user.
-	function getProfile(profileValues){
+	function getProfile(userName){
 
-				
-
+		var profileValues = getProfileData(userName);
+	
 		if(profileValues != null)
 			return "<div class='miniprofile'> " +
 									"@"+profileValues.name +
@@ -277,11 +278,10 @@ var tweetChat = (function($) {
 
 	return {
 		keyPressEvent:keyPressEvent,
-		getProfile:getProfile,
 		onNewMessage:onNewMessage,
 		login:login,
-		getProfileRefString:getProfileRefString,
 		logoutButton:logoutButton,
-		unload:unload
+		unload:unload,
+		getProfile:getProfile
 	};
  }(jQuery));
