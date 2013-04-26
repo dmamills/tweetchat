@@ -133,8 +133,8 @@ $(document).ready(function(){
 		currentUserRef.remove();
 		
 		messagesRef.off('child_added',tweetChat.onNewMessage);
-		userRef.off('child_added',userLogin);
-		userRef.off('child_removed',userLogoff);
+		userRef.off('child_added',tweetChat.userLogin);
+		userRef.off('child_removed',tweetChat.userLogoff);
 
 		//test to see if last user, if so delete room
 		var tempUserRef = new Firebase(fbUrl+roomName+'/users');
@@ -240,30 +240,32 @@ var tweetChat = (function($) {
 				$('.message').get(0).remove();
 				count--;
 			};
-		};	
+		};
+
+		function userLogin(snapshot) {
+			var tempUserData = snapshot.val();
+ 			$('ul').append('<li>'+tempUserData.name+'</li>');
+		};
+
+		function userLogoff(snapshot) {
+			var tempUserData = snapshot.val();
+	 		$('li').each(function(){
+	 		if($(this).text() == tempUserData.name) {
+	 			$(this).remove();
+	 			}
+	 		});
+		};
     	return {
     		keyPressEvent:keyPressEvent,
     		createTweetButton:createTweetButton,
     		getProfile:getProfile,
-    		onNewMessage:onNewMessage
+    		onNewMessage:onNewMessage,
+    		userLogin:userLogin,
+    		userLogoff:userLogoff
     	};
 
  }(jQuery) );
 
-
-var userLogin = function(snapshot) {
-	var tempUserData = snapshot.val();
- 	$('ul').append('<li>'+tempUserData.name+'</li>');
-};
-
-var userLogoff = function(snapshot) {
-	var tempUserData = snapshot.val();
- 		$('li').each(function(){
- 		if($(this).text() == tempUserData.name) {
- 			$(this).remove();
- 		}
- 	});
-}
 
 const MAX_MESSAGES = 30;
 var count = 0;
