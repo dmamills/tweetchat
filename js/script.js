@@ -154,7 +154,7 @@ var tweetChat = (function($) {
 				if(messageText == '')
 					return;
 
-			if(messageText.length>200) {
+			if(messageText.length>500) {
 				chatMessage.val('');
 				$('.errormessages').html('Message too long').show().delay(1000).fadeOut(500);
 				return;
