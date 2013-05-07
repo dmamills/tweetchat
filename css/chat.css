@@ -123,6 +123,7 @@ img#loginbutton:hover {
 	float:left;
 	border-radius:15px;
 	padding: 5px 5px 10px 10px;
+	width:20%;
 }
 
 .messagename a {
@@ -134,6 +135,7 @@ img#loginbutton:hover {
 	padding-top:5px;
 	word-wrap:break-word;
 	color: #141316;
+	margin-left:20%;
 }
 
 .messageimg img {

@@ -55,6 +55,7 @@ $(document).ready(function(){
 
 	//bind event handlers to page
 	$('#chatmessage').keypress(tweetChat.keyPressEvent); 
+	//$('#chatmessage').on('paste',tweetChat.inputChangeEvent);
 	$('#logoutbutton').on('click',tweetChat.logoutButton);
 	$(window).unload(tweetChat.unload);
 });
@@ -147,23 +148,42 @@ var tweetChat = (function($) {
 		});
 	};
 
+	function inputChangeEvent(e){
+		
+	};
+
 	function keyPressEvent(e){
-		var chatMessage = $('#chatmessage');
+		var chatMessageEl = $('#chatmessage');
+		var charCounterEl = $('.charcounter');
+		var messageLength = chatMessageEl.val().length;
+		var charsRemaining = 500 - (messageLength + 1);
+
+		charCounterEl.html(charsRemaining);
+		if(charsRemaining > 100) {
+			charCounterEl.css('color','green');
+		}else if( charsRemaining > 50){
+			charCounterEl.css('color','yellow');
+		}else {
+			charCounterEl.css('color','red');
+		}
+
+		console.log('keycode: '+ e.keyCode);
 		if(e.keyCode === 13) {
-			var messageText = chatMessage.val();
+			var messageText = chatMessageEl.val();
 				if(messageText == '')
 					return;
 
 			if(messageText.length>500) {
-				chatMessage.val('');
+				chatMessageEl.val('');
+				charCounterEl.val('500');
 				$('.errormessages').html('Message too long').show().delay(1000).fadeOut(500);
 				return;
 			}
 			messageText = strip(messageText);
 			var d = new Date();
 			var newMessageRef = new Firebase(fbUrl+roomName+'/messages/'+d.getTime());
-			newMessageRef.set({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText});
-			chatMessage.val('');
+			newMessageRef.set({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText, ts:d.getTime()});
+			chatMessageEl.val('');
 		}
 	};
 
@@ -202,9 +222,10 @@ var tweetChat = (function($) {
 	};
 	
 	//create new message function
-	function createNewMessage(name,picture,message) {
-	
-	 	var rString = "<div class='message cf'> <div class='messageside'> <div class='messageimage'> <a href='http://twitter.com/" + name + " ' target='_blank' > <img src='" + picture + "'title='"+name+"'> </div>"
+	function createNewMessage(name,picture,message,ts) {
+		var d = new Date(ts);
+		var m = moment(d);
+	 	var rString = "<div class='message cf'> <div class='messageside'><div class='messagets'>" + m.format('MM/d/YYYY hh:mm:ss') +" </div><div class='messageimage'> <a href='http://twitter.com/" + name + " ' target='_blank' > <img src='" + picture + "'title='"+name+"'> </div>"
 	 	+ "<div class='messagename'> " + name+ "</a> </div> </div> <div class='messagetext'> " + createAnchors(message) + " </div>  </div>";
 	 	return rString; 
 	};
@@ -212,7 +233,7 @@ var tweetChat = (function($) {
 	function onNewMessage(snapshot) {
 		var messageData = snapshot.val();
 		count++;
-		$('.chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message));
+		$('.chat').append(createNewMessage(messageData.name,messageData.picture,messageData.message,messageData.ts));
 		$('.chat').scrollTop($('.chat')[0].scrollHeight);
 		if(count>MAX_MESSAGES){
 			$('.message').get(0).remove();
@@ -282,6 +303,7 @@ var tweetChat = (function($) {
 		login:login,
 		logoutButton:logoutButton,
 		unload:unload,
-		getProfile:getProfile
+		getProfile:getProfile,
+		inputChangeEvent:inputChangeEvent
 	};
  }(jQuery));
