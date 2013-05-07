@@ -55,7 +55,8 @@ $(document).ready(function(){
 
 	//bind event handlers to page
 	$('#chatmessage').keypress(tweetChat.keyPressEvent); 
-	//$('#chatmessage').on('paste',tweetChat.inputChangeEvent);
+	$('#chatmessage').on('keydown',tweetChat.keydownEvent);
+	$('#chatmessage').on('paste',tweetChat.pasteEvent);
 	$('#logoutbutton').on('click',tweetChat.logoutButton);
 	$(window).unload(tweetChat.unload);
 });
@@ -64,9 +65,15 @@ var tweetChat = (function($) {
 
 	const MAX_MESSAGES = 30;
 	var count = 0;
+
+	const MAX_CHARS = 500;
+	var charsRemaining = MAX_CHARS;
 	var fbUrl = 'https://tweetchat.firebaseio.com/';
 	var roomName,userRef, messagesRef, roomRef,loggedInUser;
 	var firebaseRef = new Firebase(fbUrl);
+
+	var messageCache = [];
+	var messageIndex = -1;
 
 
 	function logoutButton(){
@@ -148,42 +155,91 @@ var tweetChat = (function($) {
 		});
 	};
 
-	function inputChangeEvent(e){
-		
+	function updateCounter(){
+		var charCounterEl = $('.charcounter');
+		charCounterEl.html(charsRemaining);
+		if(charsRemaining > 100) {
+			charCounterEl.css('color','green');
+		} else if( charsRemaining > 50){
+			charCounterEl.css('color','yellow');
+		} else {
+			charCounterEl.css('color','red');
+		}
+	};
+
+
+	function keydownEvent(e){
+		if(e.keyCode === 8 || e.keyCode === 46){
+			var messageLength = $('#chatmessage').val().length;
+			if( messageLength > 0) {
+				charsRemaining++;
+				updateCounter();
+			}
+			return;
+		}
+
+		var chatMessageEl = $('#chatmessage');
+		if(e.keyCode === 38) {
+			//up key
+			if(messageCache[messageIndex-1] !== undefined){
+				messageIndex--;
+				chatMessageEl.val(messageCache[messageIndex]);
+			}
+			return;
+		}
+
+		if(e.keyCode === 40){
+			//down key
+			if(messageIndex === messageCache.length-1)
+				chatMessageEl.val('');
+
+			if(messageIndex < messageCache.length-1 && messageCache[messageIndex+1] !== undefined){
+				messageIndex++;
+				chatMessageEl.val(messageCache[messageIndex]);
+			}
+			return;
+		}
+	};
+
+	function pasteEvent(e){
+		setTimeout(function() { 
+			charsRemaining = MAX_CHARS - $('#chatmessage').val().length;
+			updateCounter();
+		},50);
 	};
 
 	function keyPressEvent(e){
 		var chatMessageEl = $('#chatmessage');
-		var charCounterEl = $('.charcounter');
 		var messageLength = chatMessageEl.val().length;
-		var charsRemaining = 500 - (messageLength + 1);
 
-		charCounterEl.html(charsRemaining);
-		if(charsRemaining > 100) {
-			charCounterEl.css('color','green');
-		}else if( charsRemaining > 50){
-			charCounterEl.css('color','yellow');
-		}else {
-			charCounterEl.css('color','red');
+		if(e.keyCode !== 13){
+			charsRemaining = MAX_CHARS - (messageLength + 1);
+			updateCounter();
 		}
 
-		console.log('keycode: '+ e.keyCode);
 		if(e.keyCode === 13) {
 			var messageText = chatMessageEl.val();
-				if(messageText == '')
+				if(messageText == '') {	
 					return;
+				}
 
-			if(messageText.length>500) {
+			if(messageText.length>MAX_CHARS) {
 				chatMessageEl.val('');
-				charCounterEl.val('500');
+				charsRemaining = MAX_CHARS;
+				updateCounter();
 				$('.errormessages').html('Message too long').show().delay(1000).fadeOut(500);
 				return;
 			}
+
+			messageCache.push(messageText);
+			messageIndex = messageCache.length;
 			messageText = strip(messageText);
 			var d = new Date();
 			var newMessageRef = new Firebase(fbUrl+roomName+'/messages/'+d.getTime());
 			newMessageRef.set({name:loggedInUser.name, picture:loggedInUser.profileimage, message: messageText, ts:d.getTime()});
 			chatMessageEl.val('');
+			charsRemaining = MAX_CHARS;
+			updateCounter();
 		}
 	};
 
@@ -304,6 +360,7 @@ var tweetChat = (function($) {
 		logoutButton:logoutButton,
 		unload:unload,
 		getProfile:getProfile,
-		inputChangeEvent:inputChangeEvent
+		keydownEvent:keydownEvent,
+		pasteEvent:pasteEvent
 	};
  }(jQuery));
