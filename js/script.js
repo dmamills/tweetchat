@@ -24,8 +24,6 @@ $(document).ready(function(){
 			qs = qs.substring(0,qs.length-1);
 			roomNameEl.val(qs);
 			roomNameEl.attr('disabled','disabled');
-		} else {
-			roomNameEl.val('Enter Room Name');
 		}
 
 	if(isMobile.any()) {
