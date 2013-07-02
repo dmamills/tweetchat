@@ -5,7 +5,7 @@ $(function() {
 		content: function(){
 			var element = $(this);
 			if(element.is("[title]")) {
-				if(element[0].className == "twitter-share-button twitter-count-horizontal")
+				if(element[0].className === "twitter-share-button twitter-count-horizontal")
 					return;
 
 				var profileString = "";
@@ -20,7 +20,7 @@ $(document).ready(function(){
 
 	var roomNameEl = $('#roomname');
 	var qs = getParameterByName('room');
-		if(qs != "") {
+		if(qs !== "") {
 			qs = qs.substring(0,qs.length-1);
 			roomNameEl.val(qs);
 			roomNameEl.attr('disabled','disabled');
@@ -30,16 +30,6 @@ $(document).ready(function(){
 		window.location = "mobile.html";
 	}
 
-
-	roomNameEl.on({focus :function(){
-		if(this.value == 'Enter Room Name') 
-			this.value = '';
-		},
-		blur: function(){
-			if(this.value == '')
-				this.value = 'Enter Room Name';
-		}
-	});
 
 	$('.chatwrapper').hide();
 	$('#loginbutton').on('click',function() {
@@ -61,10 +51,10 @@ $(document).ready(function(){
  
 var tweetChat = (function($) {
 
-	const MAX_MESSAGES = 30;
+	var MAX_MESSAGES = 30;
 	var count = 0;
 
-	const MAX_CHARS = 500;
+	var MAX_CHARS = 500;
 	var charsRemaining = MAX_CHARS;
 	var fbUrl = 'https://tweetchat.firebaseio.com/';
 	var roomName,userRef, messagesRef, roomRef,loggedInUser;
