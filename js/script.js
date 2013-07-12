@@ -14,9 +14,6 @@ $(function() {
 			}
 		}
 	});
-});
-
-$(document).ready(function(){
 
 	var roomNameEl = $('#roomname');
 	var qs = getParameterByName('room');
@@ -34,19 +31,19 @@ $(document).ready(function(){
 	$('.chatwrapper').hide();
 	$('#loginbutton').on('click',function() {
 		var name = roomNameEl.val();
-
-		if(name == '' || name == 'Enter Room Name')
-			name = 'default';
-
+		name = (name == '' || name == 'Enter Room Name')? 'default':name;
 		tweetChat.login(name);
 	});  
 
 	//bind event handlers to page
-	$('#chatmessage').keypress(tweetChat.keyPressEvent); 
-	$('#chatmessage').on('keydown',tweetChat.keydownEvent);
-	$('#chatmessage').on('paste',tweetChat.pasteEvent);
+	var chatMessageEl = $('#chatmessage');
+	chatMessageEl.keypress(tweetChat.keyPressEvent); 
+	chatMessageEl.on('keydown',tweetChat.keydownEvent);
+	chatMessageEl.on('paste',tweetChat.pasteEvent);
+
 	$('#logoutbutton').on('click',tweetChat.logoutButton);
 	$(window).unload(tweetChat.unload);
+
 });
  
 var tweetChat = (function($) {
